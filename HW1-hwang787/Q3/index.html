@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title> Lego Sets by Year from Rebrickable</title>
+    <script type="text/javascript" src="./lib/d3/d3.min.js"></script>
+    <script type="text/javascript" src="./lib/d3-dsv/d3-dsv.min.js"></script>
+    <script type="text/javascript" src="./lib/d3-fetch/d3-fetch.min.js"></script>
+    <style type="text/css">
+    </style>
+</head>
+<body>
+    <center>Lego Sets by Year from Rebrickable</center>
+
+    <script type="text/javascript">
+        var w = 1000;
+        var h = 400;
+        var barPadding = 20;
+        var xScale, yScale, xAxis, yAxis;
+        var formatTime = d3.timeParse("%Y");
+    
+    var dataset ={running:[],year:[]};
+    var dataset2;
+    var running =[];
+    var year=[];
+    d3.dsv("," , "q3.csv", function(data){
+        return{
+
+            year: formatTime(data.year),
+            running_total: parseInt(data.running_total)
+        }
+
+    }).then(function(data){
+        console.log(data);
+        //
+        
+        dataset2=data;
+        xScale = d3.scaleBand()
+        //domain([ d3.min(data,function(d){return d.year;}),d3.max(data, function(d){return d.year;})])
+        .domain(data.map(d=>d.year.getFullYear()))
+        .range([0,w])
+        .padding(0.3);
+        //yScale = d3.scaleLinear().domain([0,running[-1]]).range([h,0]);
+        //d3.max(data,function(d){return d.running_total;})-barPadding
+        yScale = d3.scaleLinear()
+        .domain([0,(d3.max(data, d=>d.running_total))])
+        .range([h,0])
+                
+        
+        //xScale = d3.scaleTime().domain([d3.min(year,function(d){return d}),d3.min(year,function(d){return d})]).range([0,w]);
+
+        var xScalefilter = d3.scaleBand()
+        //domain([ d3.min(data,function(d){return d.year;}),d3.max(data, function(d){return d.year;})])
+        .domain(data.filter(function(d,i) { return i % 3 == 1; }).map(d=>d.year.getFullYear()))
+        .range([0,w])
+        .padding(0.1);
+        
+        var xAxis = d3.axisBottom().scale(xScalefilter);//tickFormat(formatTime);//.tickFormat(formatTime);
+
+        //var xAxis
+
+                //Define Y axis
+        var yAxis = d3.axisLeft().scale(yScale);
+
+        var svg = d3.select("body")
+                        .append("svg")
+                        .attr("width", w+150)
+                        .attr("height", h+100)
+                        .append("g").attr("transform","translate(50,50)");
+
+
+        svg.selectAll(".bar").data(data).enter().append("rect")
+        .attr("x", function(d){ return xScale(d.year.getFullYear()); })
+        //.attr("x", function(d,i){ return i*(w/d.length); })
+        .attr("y", function(d){ return yScale(d.running_total);})
+        //.attr("y", function(d){ return (h-(running/50))})
+        .attr("width", function(d){
+            return xScale.bandwidth();
+
+        })//running.length - barPadding
+        .attr("height", function(d) {
+                    return h - yScale(d.running_total)//barPadding)
+        })
+        .attr("fill", function(d) {
+                    return "rgb(100, 0, " + Math.round(100) + ")";
+        });
+                svg.append("text")
+                    .attr("transform", "translate(" +  w  +"," + h + ")").attr("text-anchor","left").text("hwang787");
+
+                svg.append("g").attr("class", "axis").attr("transform", "translate(0," + h + ")").call(xAxis);
+                
+                //Create Y axis
+                svg.append("g").attr("class", "axis")
+                    //.attr("transform", "translate(0)")
+                    .attr("transform", "translate(0,0)").call(yAxis);   
+                        
+        });
+    </script>
+    <div style="display: inline-table; width: 20px; height: 75px; background_color: teal;">
+    </div>
+</body>
+</html>

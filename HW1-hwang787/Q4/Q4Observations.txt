@@ -1,0 +1,6 @@
+i.rows: 47
+ii.columns: 5
+iii.function: ngram-fingerprint 9702 //But Ngram Size has to be >=2
+iv.GREL_brandname: if(isNull(value),'Unbranded',value)
+v.GREL_highpriced: if(toNumber(value) > 100,'1','0')
+vi.GREL_hasoffer: if(or(toLowercase(value).contains('offer'),toLowercase(value).contains('sale'),toLowercase(value).contains('discount')),'1','0')
